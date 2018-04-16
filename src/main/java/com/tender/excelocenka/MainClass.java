@@ -13,6 +13,6 @@ import java.io.FileNotFoundException;
  */
 public class MainClass {
     public static void main(String[] args) throws FileNotFoundException{
-        System.out.println(ExcelParser.parse());
+        ExcelParser.parse();
     }
 }
