@@ -18,8 +18,14 @@ public class ObjT {
     private float cen;
     private float cenS;
     private float cenO;
+    private float balC;
+    private float balCk;
+    private float balO;
+    private float balOk;
+    private float balOb;
+    private int rang;
 
-    public ObjT(int lot, String nameC, int ots, String nameO, String ed, float cen, float cenS, float cenO) {
+    public ObjT(int lot, String nameC, int ots, String nameO, String ed, float cen, float cenS, float cenO, float balC, float balCk, float balO, float balOk, float balOb, int rang) {
         this.lot = lot;
         this.nameC = nameC;
         this.ots = ots;
@@ -28,10 +34,63 @@ public class ObjT {
         this.cen = cen;
         this.cenS = cenS;
         this.cenO = cenO;
+        this.balC = balC;
+        this.balCk = balCk;
+        this.balO = balO;
+        this.balOk = balOk;
+        this.balOb = balOb;
+        this.rang = rang;
     }
 
+    public float getBalC() {
+        return balC;
+    }
+
+    public void setBalC(float balC) {
+        this.balC = balC;
+    }
+
+    public float getBalCk() {
+        return balCk;
+    }
+
+    public void setBalCk(float balCk) {
+        this.balCk = balCk;
+    }
+
+    public float getBalO() {
+        return balO;
+    }
+
+    public void setBalO(float balO) {
+        this.balO = balO;
+    }
+
+    public float getBalOk() {
+        return balOk;
+    }
+
+    public void setBalOk(float balOk) {
+        this.balOk = balOk;
+    }
+
+    public float getBalOb() {
+        return balOb;
+    }
+
+    public void setBalOb(float balOb) {
+        this.balOb = balOb;
+    }
+
+    public int getRang() {
+        return rang;
+    }
+
+    public void setRang(int rang) {
+        this.rang = rang;
+    }
     public ObjT() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     public int getLot() {
@@ -100,7 +159,7 @@ public class ObjT {
 
     @Override
     public String toString() {
-        return "ObjT{" + "lot=" + lot + ", nameC=" + nameC + ", ots=" + ots + ", nameO=" + nameO + ", ed=" + ed + ", cen=" + cen + ", cenS=" + cenS + ", cenO=" + cenO + '}';
+        return "ObjT{" + "lot=" + lot + ", nameC=" + nameC + ", ots=" + ots + ", nameO=" + nameO + ", ed=" + ed + ", cen=" + cen + ", cenS=" + cenS + ", cenO=" + cenO + ", balC=" + balC + ", balCk=" + balCk + ", balO=" + balO + ", balOk=" + balOk + ", balOb=" + balOb + ", rang=" + rang + '}';
     }
-            
+
 }
