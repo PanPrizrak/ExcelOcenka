@@ -31,7 +31,7 @@ import javax.swing.JOptionPane;
 public class ExcelParser {
 
     static XSSFRow row;
-
+    
     public static void parse() throws FileNotFoundException {
         //инициализируем потоки
         /* String result = "";
@@ -221,6 +221,10 @@ public class ExcelParser {
             znach = new Znach((int) (i + 1), maxC, minC, maxO, minO);
             znachs.add(znach);
 
+        }
+        
+        for (int i = 0; i < objT.size(); i++){
+            objT.get(i).setBalC(1+(znachs.get(objT.get(i).getLot()).getCenMax()-objT.get(i).getCenO())/(znachs.get(objT.get(i).getLot()).getCenMax()-znachs.get(objT.get(i).getLot()).getCenaMin())*9);
         }
 
         for (int i = 0; i < objT.size(); i++) {
