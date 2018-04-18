@@ -5,6 +5,7 @@
  */
 package com.tender.excelocenka;
 
+import com.tender.entity.Bal;
 import com.tender.entity.ObjT;
 import com.tender.entity.Znach;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -22,6 +23,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -224,9 +227,35 @@ public class ExcelParser {
         }
         
         for (int i = 0; i < objT.size(); i++){
-            objT.get(i).setBalC(1+(znachs.get(objT.get(i).getLot()).getCenMax()-objT.get(i).getCenO())/(znachs.get(objT.get(i).getLot()).getCenMax()-znachs.get(objT.get(i).getLot()).getCenaMin())*9);
+            
+            int maxO = znachs.get(objT.get(i).getLot()).getOtsMax();
+            int minO = znachs.get(objT.get(i).getLot()).getOtsMin();
+            float maxC = znachs.get(objT.get(i).getLot()).getCenaMax();
+            float minC = znachs.get(objT.get(i).getLot()).getCenaMin();
+            
+            float cenaK = (float) 0.8;
+            float otsK = (float) 0.2;
+            //=1+(МАКС($E$5:$E$8)-E5)/(МАКС($E$5:$E$8)-МИН($E$5:$E$8))*9
+            objT.get(i).setBalC(1+(maxC-objT.get(i).getCenO())/(maxC-minC)*9);
+            objT.get(i).setBalCk(objT.get(i).getBalC() * cenaK);
+            //=1+(F5-МИН($F$5:F$8))/(МАКС($F$5:F$8)-МИН($F$5:F$8))*9
+            objT.get(i).setBalO(1+(objT.get(i).getOts()-minO)/(maxO-minO)*9);
+            objT.get(i).setBalOk(objT.get(i).getBalO() * otsK);
+            
+            objT.get(i).setBalOb(objT.get(i).getBalOk()+ objT.get(i).getBalCk());
         }
-
+        
+        ArrayList<Bal> bals = new ArrayList<Bal>();
+        for (int i = 0; i < objT.size(); i++){
+            Bal bal = new Bal();
+            bal.setPos(i);
+            bal.setLot(objT.get(i).getLot());
+            bal.setBalO(objT.get(i).getBalOb());
+            bals.add(bal);
+        }
+        
+        
+        
         for (int i = 0; i < objT.size(); i++) {
             System.out.println(objT.get(i).toString());
         }

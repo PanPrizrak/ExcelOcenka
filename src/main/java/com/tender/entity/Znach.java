@@ -11,7 +11,7 @@ package com.tender.entity;
  */
 public class Znach {
     private int nomL;
-    private float cenMax;
+    private float cenaMax;
     private float cenaMin;
     private int otsMax;
     private int otsMin;
@@ -21,7 +21,7 @@ public class Znach {
 
     public Znach(int nomL, float cenMax, float cenaMin, int otsMax, int otsMin) {
         this.nomL = nomL;
-        this.cenMax = cenMax;
+        this.cenaMax = cenMax;
         this.cenaMin = cenaMin;
         this.otsMax = (int) otsMax;
         this.otsMin = (int) otsMin;
@@ -35,12 +35,12 @@ public class Znach {
         this.nomL = nomL;
     }
 
-    public float getCenMax() {
-        return cenMax;
+    public float getCenaMax() {
+        return cenaMax;
     }
 
-    public void setCenMax(float cenMax) {
-        this.cenMax = cenMax;
+    public void setCenaMax(float cenaMax) {
+        this.cenaMax = cenaMax;
     }
 
     public float getCenaMin() {
@@ -69,7 +69,7 @@ public class Znach {
 
     @Override
     public String toString() {
-        return "Znach{" + "nomL=" + nomL + ", cenMax=" + cenMax + ", cenaMin=" + cenaMin + ", otsMax=" + otsMax + ", otsMin=" + otsMin + '}';
+        return "Znach{" + "nomL=" + nomL + ", cenMax=" + cenaMax + ", cenaMin=" + cenaMin + ", otsMax=" + otsMax + ", otsMin=" + otsMin + '}';
     }
 
 }
