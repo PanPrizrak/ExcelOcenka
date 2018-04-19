@@ -34,7 +34,7 @@ import javax.swing.JOptionPane;
 public class ExcelParser {
 
     static XSSFRow row;
-    
+
     public static void parse() throws FileNotFoundException {
         //инициализируем потоки
         /* String result = "";
@@ -200,7 +200,7 @@ public class ExcelParser {
             int minO = objT.get(pos).getOts();
             int maxO = objT.get(pos).getOts();
 
-            while (objT.get(pos).getLot() == (i + 1) && pos <= objT.size()-2) {
+            while (objT.get(pos).getLot() == (i + 1) && pos <= objT.size() - 2) {
 
                 if (objT.get(pos).getCenO() > maxC) {
                     maxC = objT.get(pos).getCenO();
@@ -218,51 +218,93 @@ public class ExcelParser {
                 if (pos < objT.size() - 1) {
                     pos++;
                 }//if
-                System.out.println(pos);
+           //     System.out.println(pos);
             }
 
             znach = new Znach((int) (i + 1), maxC, minC, maxO, minO);
             znachs.add(znach);
 
         }
-        
-        for (int i = 0; i < objT.size(); i++){
-            
-            int maxO = znachs.get(objT.get(i).getLot()).getOtsMax();
-            int minO = znachs.get(objT.get(i).getLot()).getOtsMin();
-            float maxC = znachs.get(objT.get(i).getLot()).getCenaMax();
-            float minC = znachs.get(objT.get(i).getLot()).getCenaMin();
-            
+
+        for (int i = 0; i < objT.size(); i++) {
+
+            int maxO = znachs.get(objT.get(i).getLot()-1).getOtsMax();
+            int minO = znachs.get(objT.get(i).getLot()-1).getOtsMin();
+            float maxC = znachs.get(objT.get(i).getLot()-1).getCenaMax();
+            float minC = znachs.get(objT.get(i).getLot()-1).getCenaMin();
+
             float cenaK = (float) 0.8;
             float otsK = (float) 0.2;
+
             //=1+(МАКС($E$5:$E$8)-E5)/(МАКС($E$5:$E$8)-МИН($E$5:$E$8))*9
-            objT.get(i).setBalC(1+(maxC-objT.get(i).getCenO())/(maxC-minC)*9);
+            if (maxC != minC) {
+                objT.get(i).setBalC(1 + (maxC - objT.get(i).getCenO()) / (maxC - minC) * 9);
+            } else {
+                objT.get(i).setBalC((float) 1.0);
+            }
             objT.get(i).setBalCk(objT.get(i).getBalC() * cenaK);
+
             //=1+(F5-МИН($F$5:F$8))/(МАКС($F$5:F$8)-МИН($F$5:F$8))*9
-            objT.get(i).setBalO(1+(objT.get(i).getOts()-minO)/(maxO-minO)*9);
+            if (maxO != minO) {
+                objT.get(i).setBalO(1 + (objT.get(i).getOts() - minO) / (maxO - minO) * 9);
+            } else {
+                objT.get(i).setBalO((float) 1.0);
+            }
             objT.get(i).setBalOk(objT.get(i).getBalO() * otsK);
-            
-            objT.get(i).setBalOb(objT.get(i).getBalOk()+ objT.get(i).getBalCk());
+
+            objT.get(i).setBalOb(objT.get(i).getBalOk() + objT.get(i).getBalCk());
         }
-        
+
         ArrayList<Bal> bals = new ArrayList<Bal>();
-        for (int i = 0; i < objT.size(); i++){
+        for (int i = 0; i < objT.size(); i++) {
             Bal bal = new Bal();
             bal.setPos(i);
             bal.setLot(objT.get(i).getLot());
             bal.setBalO(objT.get(i).getBalOb());
             bals.add(bal);
         }
-        
-        
-        
-        for (int i = 0; i < objT.size(); i++) {
+        //int pos =0;
+        pos = 0;
+        for (int i = 1; i < bals.get(bals.size()-1).getLot(); i++) {
+            int posN = pos;
+            
+            while (bals.get(pos).getLot() == i && pos != bals.size()) {
+                pos++;
+            }
+
+            for (int a = posN; a < pos - 1; a++) {
+                for (int b = posN; b < pos - a; b++) {
+                    if (bals.get(b).getBalO() < bals.get(b + 1).getBalO()) {
+                        
+                        Bal bufB = new Bal();
+                        bufB.setPos(bals.get(b).getPos());
+                        bufB.setLot(bals.get(b).getLot());
+                        bufB.setBalO(bals.get(b).getBalO());
+                        
+                        bals.set(b, bals.get(b + 1));
+                        bals.set((b + 1), bufB);
+                    }
+                }
+            }
+            int r = 1;
+            for (int z = posN; z < pos; z++) {
+                bals.get(z).setRang(r);
+                r++;
+            }
+        }
+
+        /*for (int i = 0; i < objT.size(); i++) {
             System.out.println(objT.get(i).toString());
         }
 
         for (int i = 0; i < znachs.size(); i++) {
             System.out.println(znachs.get(i).toString());
         }
+
+        for (int i = 0; i < bals.size(); i++) {
+            System.out.println(bals.get(i).toString());
+        }*/
+
         try {
             fis.close();
         } catch (IOException ex) {
