@@ -218,7 +218,7 @@ public class ExcelParser {
                 if (pos < objT.size() - 1) {
                     pos++;
                 }//if
-           //     System.out.println(pos);
+                //     System.out.println(pos);
             }
 
             znach = new Znach((int) (i + 1), maxC, minC, maxO, minO);
@@ -228,10 +228,10 @@ public class ExcelParser {
 
         for (int i = 0; i < objT.size(); i++) {
 
-            int maxO = znachs.get(objT.get(i).getLot()-1).getOtsMax();
-            int minO = znachs.get(objT.get(i).getLot()-1).getOtsMin();
-            float maxC = znachs.get(objT.get(i).getLot()-1).getCenaMax();
-            float minC = znachs.get(objT.get(i).getLot()-1).getCenaMin();
+            int maxO = znachs.get(objT.get(i).getLot() - 1).getOtsMax();
+            int minO = znachs.get(objT.get(i).getLot() - 1).getOtsMin();
+            float maxC = znachs.get(objT.get(i).getLot() - 1).getCenaMax();
+            float minC = znachs.get(objT.get(i).getLot() - 1).getCenaMin();
 
             float cenaK = (float) 0.8;
             float otsK = (float) 0.2;
@@ -264,25 +264,37 @@ public class ExcelParser {
             bals.add(bal);
         }
         //int pos =0;
+        for (int i = 0; i < 10; i++) {//bals.size()
+            System.out.println(bals.get(i).toString());
+        }
+        
         pos = 0;
-        for (int i = 1; i < bals.get(bals.size()-1).getLot(); i++) {
+        for (int i = 1; i < bals.get(bals.size() - 1).getLot(); i++) {
             int posN = pos;
-            
+
             while (bals.get(pos).getLot() == i && pos != bals.size()) {
                 pos++;
             }
 
-            for (int a = posN; a < pos - 1; a++) {
+            for (int a = posN+1; a < pos; a++) {
                 for (int b = posN; b < pos - a; b++) {
                     if (bals.get(b).getBalO() < bals.get(b + 1).getBalO()) {
-                        
+
                         Bal bufB = new Bal();
                         bufB.setPos(bals.get(b).getPos());
                         bufB.setLot(bals.get(b).getLot());
                         bufB.setBalO(bals.get(b).getBalO());
                         
-                        bals.set(b, bals.get(b + 1));
-                        bals.set((b + 1), bufB);
+                        bals.get(b).setPos(bals.get(b + 1).getPos());
+                        bals.get(b).setLot(bals.get(b + 1).getLot());
+                        bals.get(b).setBalO(bals.get(b + 1).getBalO());
+                        
+                        bals.get(b + 1).setPos(bufB.getPos());
+                        bals.get(b + 1).setLot(bufB.getLot());
+                        bals.get(b + 1).setBalO(bufB.getBalO());
+                        
+                        /*bals.set(b, bals.get(b + 1));
+                        bals.set((b + 1), bufB);*/
                     }
                 }
             }
@@ -293,18 +305,45 @@ public class ExcelParser {
             }
         }
 
+        //проверка принципа
+        System.out.println("До сортировки:");
+        
+        ArrayList<Double> mas = new ArrayList<Double>();
+        
+        for (int i = 0; i < 10; i++) {
+            mas.add(new Double(((i + 1)*(0.123456789*i))+i));
+            System.out.print(mas.get(i) + " ");
+        }
+
+        for (int i = 1; i < mas.size(); i++) {
+            for (int j = 0; j < mas.size() - i; j++) {
+                if (mas.get(j) < mas.get(j + 1)) {
+
+                   Double bufM = new Double(mas.get(j));
+
+                    mas.set(j, mas.get(j + 1));
+                    mas.set((j + 1), bufM);
+                }
+            }
+        }
+        System.out.println("\nПосле сортировки:");
+        
+        for (int i = 0; i < mas.size(); i++) {
+            System.out.print(mas.get(i) + " ");
+        }
+
+
         /*for (int i = 0; i < objT.size(); i++) {
             System.out.println(objT.get(i).toString());
         }
 
         for (int i = 0; i < znachs.size(); i++) {
             System.out.println(znachs.get(i).toString());
-        }
-
-        for (int i = 0; i < bals.size(); i++) {
-            System.out.println(bals.get(i).toString());
         }*/
 
+        for (int i = 0; i < 10; i++) {//bals.size()
+            System.out.println(bals.get(i).toString());
+        }
         try {
             fis.close();
         } catch (IOException ex) {
