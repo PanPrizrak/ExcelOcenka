@@ -34,6 +34,30 @@ import javax.swing.JOptionPane;
 public class ExcelParser {
 
     static XSSFRow row;
+    private static float cenaK = (float) 0.8;
+    private static float otsK = (float) 0.2;
+
+    private static ObjT getRaschet(ObjT t, float maxC, float minC, int maxO, int minO) {
+
+        if (maxC != minC) {
+            t.setBalC(1 + (maxC - t.getCenO()) / (maxC - minC) * 9);
+        } else {
+            t.setBalC((float) 1.0);
+        }
+        t.setBalCk(t.getBalC() * cenaK);
+
+        //=1+(F5-МИН($F$5:F$8))/(МАКС($F$5:F$8)-МИН($F$5:F$8))*9
+        if (maxO != minO) {
+            t.setBalO(1 + (t.getOts() - minO) / (maxO - minO) * 9);
+        } else {
+            t.setBalO((float) 1.0);
+        }
+        t.setBalOk(t.getBalO() * otsK);
+
+        t.setBalOb(t.getBalOk() + t.getBalCk());
+
+        return t;
+    }
 
     public static void parse() throws FileNotFoundException {
         //инициализируем потоки
@@ -98,10 +122,13 @@ public class ExcelParser {
         } catch (IOException ex) {
             Logger.getLogger(ExcelParser.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        //Заполнение из таблицы экселя
         XSSFSheet spreadsheet = workbook.getSheetAt(3);
         Iterator< Row> rowIterator = spreadsheet.iterator();
         ArrayList<ObjT> objT = new ArrayList<>();
         ObjT buf;
+
         while (rowIterator.hasNext()) {
             row = (XSSFRow) rowIterator.next();
             /*Iterator < Cell > cellIterator = row.cellIterator();
@@ -127,6 +154,7 @@ public class ExcelParser {
                 }
             }
             result += "\n";*/
+
             buf = new ObjT();
             for (int i = 0; i < 8; i++) {
                 switch (i) {
@@ -189,6 +217,7 @@ public class ExcelParser {
             objT.add(buf);
         }
 
+        //Определини экстернов значений
         ArrayList<Znach> znachs = new ArrayList<Znach>();
         Znach znach;
         int pos = 0;
@@ -226,6 +255,7 @@ public class ExcelParser {
 
         }
 
+        //Расчет балов
         for (int i = 0; i < objT.size(); i++) {
 
             int maxO = znachs.get(objT.get(i).getLot() - 1).getOtsMax();
@@ -233,10 +263,9 @@ public class ExcelParser {
             float maxC = znachs.get(objT.get(i).getLot() - 1).getCenaMax();
             float minC = znachs.get(objT.get(i).getLot() - 1).getCenaMin();
 
-            float cenaK = (float) 0.8;
-            float otsK = (float) 0.2;
-
-            //=1+(МАКС($E$5:$E$8)-E5)/(МАКС($E$5:$E$8)-МИН($E$5:$E$8))*9
+            ObjT bufBal = new ObjT();
+            bufBal = getRaschet(objT.get(i), maxC, minC, maxO, minO);
+            /* //=1+(МАКС($E$5:$E$8)-E5)/(МАКС($E$5:$E$8)-МИН($E$5:$E$8))*9
             if (maxC != minC) {
                 objT.get(i).setBalC(1 + (maxC - objT.get(i).getCenO()) / (maxC - minC) * 9);
             } else {
@@ -252,9 +281,64 @@ public class ExcelParser {
             }
             objT.get(i).setBalOk(objT.get(i).getBalO() * otsK);
 
-            objT.get(i).setBalOb(objT.get(i).getBalOk() + objT.get(i).getBalCk());
+            objT.get(i).setBalOb(objT.get(i).getBalOk() + objT.get(i).getBalCk());*/
         }
 
+        /*ObjT z1 = new ObjT(); test getRaschet
+        z1 = objT.get(20);
+        System.out.println("Z " + z1.toString());
+        //ObjT zz =new ObjT();
+        z1 = getRaschet(z1, znachs.get(z1.getLot()).getCenaMax(), znachs.get(z1.getLot()).getCenaMin(), znachs.get(z1.getLot()).getOtsMax(), znachs.get(z1.getLot()).getOtsMin());
+         System.out.println("Z posle " + z1.toString());
+         System.out.println("ObjT " + objT.get(20));*/
+        //попарное сравнение
+        ArrayList<ObjT> parSrav = new ArrayList<ObjT>();
+        for (int i = 0; i < objT.size(); i++) {
+            ObjT bufO = new ObjT();
+            bufO = objT.get(i);
+            ObjT bufOp = new ObjT();
+            int k = i + 1;
+            while (objT.get(i).getLot() == objT.get(k).getLot()) {
+                bufOp = objT.get(k);
+                float maxC;
+                float minC;
+                int maxO;
+                int minO;
+                if (objT.get(i).getCenO() > objT.get(k).getCenO()) {
+                    maxC = objT.get(i).getCenO();
+                    minC = objT.get(k).getCenO();
+                } else {
+                    maxC = objT.get(k).getCenO();
+                    minC = objT.get(i).getCenO();
+                }
+
+                if (objT.get(i).getOts() > objT.get(k).getOts()) {
+                    maxO = objT.get(i).getOts();
+                    minO = objT.get(k).getOts();
+                } else {
+                    maxO = objT.get(k).getOts();
+                    minO = objT.get(i).getOts();
+                }
+
+                bufO = getRaschet(bufO, maxC, minC, maxO, minO);
+                bufOp = getRaschet(bufOp, maxC, minC, maxO, minO);
+                if (bufO.getBalOb() > bufOp.getBalOb()) {
+                    bufO.setRang(1);
+                    bufOp.setRang(2);
+                } else if (bufO.getBalOb() == bufOp.getBalOb()) {
+                    bufO.setRang(1);
+                    bufOp.setRang(1);
+                } else {
+                    bufO.setRang(2);
+                    bufOp.setRang(1);
+                }
+                
+                parSrav.add(bufO);
+                parSrav.add(bufOp);
+            }//while
+        }//for
+
+        //Заполнение объеекта Bal
         ArrayList<Bal> bals = new ArrayList<Bal>();
         for (int i = 0; i < objT.size(); i++) {
             Bal bal = new Bal();
@@ -264,10 +348,10 @@ public class ExcelParser {
             bals.add(bal);
         }
         //int pos =0;
-        for (int i = 0; i < 10; i++) {//bals.size()
+        /*for (int i = 0; i < 10; i++) {//bals.size()
             System.out.println(bals.get(i).toString());
-        }
-        
+        }*/
+
         pos = 0;
         for (int i = 1; i < bals.get(bals.size() - 1).getLot(); i++) {
             int posN = pos;
@@ -276,7 +360,7 @@ public class ExcelParser {
                 pos++;
             }
 
-            for (int a = posN+1; a < pos; a++) {
+            for (int a = posN + 1; a < pos; a++) {
                 for (int b = posN; b < pos - a; b++) {
                     if (bals.get(b).getBalO() < bals.get(b + 1).getBalO()) {
 
@@ -284,15 +368,15 @@ public class ExcelParser {
                         bufB.setPos(bals.get(b).getPos());
                         bufB.setLot(bals.get(b).getLot());
                         bufB.setBalO(bals.get(b).getBalO());
-                        
+
                         bals.get(b).setPos(bals.get(b + 1).getPos());
                         bals.get(b).setLot(bals.get(b + 1).getLot());
                         bals.get(b).setBalO(bals.get(b + 1).getBalO());
-                        
+
                         bals.get(b + 1).setPos(bufB.getPos());
                         bals.get(b + 1).setLot(bufB.getLot());
                         bals.get(b + 1).setBalO(bufB.getBalO());
-                        
+
                         /*bals.set(b, bals.get(b + 1));
                         bals.set((b + 1), bufB);*/
                     }
@@ -305,8 +389,12 @@ public class ExcelParser {
             }
         }
 
+        for (int i = 0; i < bals.size(); i++) {
+            objT.get(bals.get(i).getPos()).setRang(bals.get(i).getRang());
+        }
+
         //проверка принципа
-        System.out.println("До сортировки:");
+        /*System.out.println("До сортировки:");
         
         ArrayList<Double> mas = new ArrayList<Double>();
         
@@ -330,13 +418,11 @@ public class ExcelParser {
         
         for (int i = 0; i < mas.size(); i++) {
             System.out.print(mas.get(i) + " ");
-        }
-
-
-        /*for (int i = 0; i < objT.size(); i++) {
+        }*/
+        for (int i = 0; i < 10; i++) {
             System.out.println(objT.get(i).toString());
         }
-
+        /*
         for (int i = 0; i < znachs.size(); i++) {
             System.out.println(znachs.get(i).toString());
         }*/

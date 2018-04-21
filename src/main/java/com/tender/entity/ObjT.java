@@ -24,7 +24,23 @@ public class ObjT {
     private float balOk;
     private float balOb;
     private int rang;
-
+    
+    public ObjT (ObjT t) {
+        this.setLot(t.getLot());
+        this.setNameC(t.getNameC());
+        this.setNameO(t.getNameO());
+        this.setOts(t.getOts());
+        this.setEd(t.getEd());
+        this.setCen(t.getCen());
+        this.setCenS(t.getCenS());
+        this.setCenO(t.getCenO());
+        this.setBalC(t.getBalC());
+        this.setBalCk(t.getBalCk());
+        this.setBalO(t.getBalO());
+        this.setBalOk(t.getBalOk());
+        this.setBalOb(t.getBalOb());
+    }
+    
     public ObjT(int lot, String nameC, int ots, String nameO, String ed, float cen, float cenS, float cenO, float balC, float balCk, float balO, float balOk, float balOb, int rang) {
         this.lot = lot;
         this.nameC = nameC;
