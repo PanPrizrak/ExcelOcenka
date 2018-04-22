@@ -5,6 +5,8 @@
  */
 package com.tender.entity;
 
+import java.util.List;
+
 /**
  *
  * @author User
@@ -39,6 +41,7 @@ public class ObjT {
         this.setBalO(t.getBalO());
         this.setBalOk(t.getBalOk());
         this.setBalOb(t.getBalOb());
+        this.setRang(t.getRang());
     }
     
     public ObjT(int lot, String nameC, int ots, String nameO, String ed, float cen, float cenS, float cenO, float balC, float balCk, float balO, float balOk, float balOb, int rang) {
@@ -177,5 +180,6 @@ public class ObjT {
     public String toString() {
         return "ObjT{" + "lot=" + lot + ", nameC=" + nameC + ", ots=" + ots + ", nameO=" + nameO + ", ed=" + ed + ", cen=" + cen + ", cenS=" + cenS + ", cenO=" + cenO + ", balC=" + balC + ", balCk=" + balCk + ", balO=" + balO + ", balOk=" + balOk + ", balOb=" + balOb + ", rang=" + rang + '}';
     }
+    
 
-}
+}//ObjT
