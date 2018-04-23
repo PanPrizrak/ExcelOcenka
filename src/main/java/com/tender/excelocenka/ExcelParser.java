@@ -224,6 +224,7 @@ public class ExcelParser {
 
             }
             objT.add(buf);
+            //System.out.println("!!!!!!!!!!!!!!!!!!!!!!" + buf.toString());
         }
 
         //Определини экстернов значений
@@ -260,6 +261,7 @@ public class ExcelParser {
             }
 
             znach = new Znach((int) (i + 1), maxC, minC, maxO, minO);
+            //System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + znach.toString());
             znachs.add(znach);
 
         }
@@ -285,18 +287,19 @@ public class ExcelParser {
          System.out.println("ObjT " + objT.get(20));*/
         //попарное сравнение
         ArrayList<ObjT> parSrav = new ArrayList<ObjT>();
-        for (int i = 0; i < objT.size(); i++) {
+        System.out.println(objT.size());
+        for (int i = 0; i < objT.size()-1; i++) {
             ObjT bufO = new ObjT(objT.get(i));
             //int k = i + 1;
             float maxC;
             float minC;
             int maxO;
             int minO;
-            if (i < objT.size() - 1 && objT.get(i).getCenO() != 0 ) {
+            if (i < objT.size() - 2 && objT.get(i).getCenO() != 0 ) {
                 //while (objT.get(k).getCenO() != 0 && objT.get(i).getLot() == objT.get(k).getLot()) {
-                for (int k = (i + 1); objT.get(i).getLot() == objT.get(k).getLot(); k++) {
+                for (int k = i + 1; k < objT.size(); k++) {
 
-                    if ( objT.get(k).getCenO() != 0) {
+                    if ( objT.get(k).getCenO() != 0 && objT.get(i).getLot() == objT.get(k).getLot()) {
 
                         ObjT bufOp = new ObjT(objT.get(k));
 
@@ -351,8 +354,7 @@ public class ExcelParser {
 
         //сортировка  в каждом лоте по убыванию общих балов
         pos = 0;
-        for (int i = 1;
-                i < bals.get(bals.size() - 1).getLot(); i++) {
+        for (int i = 1; i < bals.get(bals.size() - 1).getLot(); i++) {
             int posN = pos;
 
             while (bals.get(pos).getLot() == i && pos != bals.size()) {
@@ -390,11 +392,14 @@ public class ExcelParser {
         }
 
         //присвоение рангов
-        for (int i = 0;
-                i < bals.size();
-                i++) {
+        for (int i = 0; i < bals.size(); i++) {
             objT.get(bals.get(i).getPos()).setRang((int) bals.get(i).getRang());
         }
+        
+        for (int i = 0; i < bals.size(); i++) {
+            System.out.println(bals.get(i).toString());
+        }
+        
         /*
         //проверка принципа
         System.out.println("До сортировки:");
