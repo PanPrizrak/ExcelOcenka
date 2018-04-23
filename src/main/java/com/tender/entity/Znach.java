@@ -18,6 +18,13 @@ public class Znach {
 
     public Znach() {
     }
+    public Znach (Znach z) {
+        this.nomL = z.getNomL();
+        this.cenaMax = z.getCenaMax();
+        this.cenaMin = z.getCenaMin();
+        this.otsMax = (int) z.getOtsMax();
+        this.otsMin = (int) z.getOtsMin();
+    }
 
     public Znach(int nomL, float cenMax, float cenaMin, int otsMax, int otsMin) {
         this.nomL = nomL;

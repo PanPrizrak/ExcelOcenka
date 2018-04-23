@@ -568,6 +568,32 @@ System.out.println("Bal!!!!!!!!!!!!!!!!!!!!!!!!!");
                 }//switch
             }
         }
+        
+        XSSFSheet znachM = workbook.createSheet("MinCena");
+        for (int i = 0; i < znachs.size(); i++) {
+            Row row = znachM.createRow(i);
+            Znach bufO = new Znach(znachs.get(i));
+            for (int j = 0; j < 5; j++) { // меншье 13 тк кол-во полей ObjT 14
+                Cell cell = row.createCell(j);
+                switch (j) {
+                    case 0:
+                        cell.setCellValue((int) bufO.getNomL());
+                        break;
+                    case 1:
+                        cell.setCellValue((float) bufO.getCenaMax());
+                        break;
+                    case 2:
+                        cell.setCellValue((float) bufO.getCenaMin());
+                        break;
+                    case 3:
+                        cell.setCellValue((int) bufO.getOtsMax());
+                        break;
+                    case 4:
+                        cell.setCellValue((int) bufO.getOtsMin());
+                        break;
+                }//switch
+            }
+        }
 
         try {
             FileOutputStream outputStream = new FileOutputStream(window.getSelectedFile());
