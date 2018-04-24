@@ -288,18 +288,18 @@ public class ExcelParser {
         //попарное сравнение
         ArrayList<ObjT> parSrav = new ArrayList<ObjT>();
         System.out.println(objT.size());
-        for (int i = 0; i < objT.size()-1; i++) {
+        for (int i = 0; i < objT.size() - 1; i++) {
             ObjT bufO = new ObjT(objT.get(i));
             //int k = i + 1;
             float maxC;
             float minC;
             int maxO;
             int minO;
-            if (i < objT.size() - 2 && objT.get(i).getCenO() != 0 ) {
+            if (i < objT.size() - 2 && objT.get(i).getCenO() != 0) {
                 //while (objT.get(k).getCenO() != 0 && objT.get(i).getLot() == objT.get(k).getLot()) {
                 for (int k = i + 1; k < objT.size(); k++) {
 
-                    if ( objT.get(k).getCenO() != 0 && objT.get(i).getLot() == objT.get(k).getLot()) {
+                    if (objT.get(k).getCenO() != 0 && objT.get(i).getLot() == objT.get(k).getLot()) {
 
                         ObjT bufOp = new ObjT(objT.get(k));
 
@@ -354,15 +354,15 @@ public class ExcelParser {
 
         //сортировка  в каждом лоте по убыванию общих балов
         pos = 0;
-        for (int i = 1; i < bals.get(bals.size() - 1).getLot(); i++) {
+        for (int i = 1; i <= bals.get(bals.size() - 1).getLot(); i++) {
             int posN = pos;
 
-            while (bals.get(pos).getLot() == i && pos != bals.size()) {
-                pos++;
+            while ( pos < bals.size() && bals.get(pos).getLot() == i && pos < bals.size()) {
+                pos+=1;
             }
 
-            for (int a = posN + 1; a < pos; a++) {
-                for (int b = posN; b < pos - a; b++) {
+            for (int a = posN; a < pos-1; a++) {
+                for (int b = pos-2; b >= a; b--) {
                     if (bals.get(b).getBalO() < bals.get(b + 1).getBalO()) {
 
                         Bal bufB = new Bal();
@@ -395,11 +395,11 @@ public class ExcelParser {
         for (int i = 0; i < bals.size(); i++) {
             objT.get(bals.get(i).getPos()).setRang((int) bals.get(i).getRang());
         }
-        
-        for (int i = 0; i < bals.size(); i++) {
+
+        for (int i = 0; i < bals.size(); i++) {//bals.size()
             System.out.println(bals.get(i).toString());
         }
-        
+
         /*
         //проверка принципа
         System.out.println("До сортировки:");
@@ -573,7 +573,7 @@ System.out.println("Bal!!!!!!!!!!!!!!!!!!!!!!!!!");
                 }//switch
             }
         }
-        
+
         XSSFSheet znachM = workbook.createSheet("MinCena");
         for (int i = 0; i < znachs.size(); i++) {
             Row row = znachM.createRow(i);
