@@ -8,6 +8,7 @@ package com.tender.excelocenka;
 import com.tender.entity.Bal;
 import com.tender.entity.ObjT;
 import com.tender.entity.Znach;
+import com.tender.write.Write;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -37,7 +38,7 @@ public class ExcelParser {
     static XSSFRow row;
     private static float cenaK = (float) 0.8;
     private static float otsK = (float) 0.2;
-
+    
     private static void getRaschet(ObjT t, float maxC, float minC, int maxO, int minO) {
 
         if (maxC != minC) {
@@ -45,9 +46,8 @@ public class ExcelParser {
         } else {
             t.setBalC((float) 1.0);
         }
-        t.setBalCk(t.getBalC() * cenaK);
+        t.setBalCk((float) t.getBalC() * cenaK);
 
-        //=1+(F5-МИН($F$5:F$8))/(МАКС($F$5:F$8)-МИН($F$5:F$8))*9
         if (maxO != minO) {
             float b1;
             float b2;
@@ -62,58 +62,14 @@ public class ExcelParser {
         t.setBalOk((float) t.getBalO() * otsK);
 
         t.setBalOb((float) t.getBalOk() + t.getBalCk());
-
-        //return t;
+        
+        float balCk = (float) t.getBalC() * cenaK;
+        float balOk = (float) t.getBalO() * otsK;
+        if (balCk < 0 || balCk > 10 || balOk < 0 || balOk > 10 )
+            JOptionPane.showMessageDialog(null, t.toString()+"!!!"+maxC+"!!!"+minC+"!!!"+maxO+"!!!"+minO);
     }
 
     public static void parse() throws FileNotFoundException {
-        //инициализируем потоки
-        /* String result = "";
-        InputStream inputStream = null;
-        HSSFWorkbook workBook = null;
-        JFileChooser window = new JFileChooser();
-        int returnValue = window.showOpenDialog(null);
-        inputStream = null;
-        if(returnValue==JFileChooser.APPROVE_OPTION)
-            inputStream = new FileInputStream(window.getSelectedFile());
-            JOptionPane.showMessageDialog(null, window.getSelectedFile().toString());
-        try {
-            //inputStream = new FileInputStream(fileName);
-            workBook = new HSSFWorkbook(inputStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-     //разбираем первый лист входного файла на объектную модель
-        Sheet sheet = workBook.getSheetAt(3);
-        Iterator<Row> it = sheet.iterator();
-     //проходим по всему листу
-        while (it.hasNext()) {
-            Row row = it.next();
-            Iterator<Cell> cells = row.iterator();
-            while (cells.hasNext()) {
-                Cell cell = cells.next();
-                int cellType = cell.getCellType();
-      //перебираем возможные типы ячеек
-                switch (cellType) {
-                    case Cell.CELL_TYPE_STRING:
-                        result += cell.getStringCellValue() + "=";
-                        break;
-                    case Cell.CELL_TYPE_NUMERIC:
-                        result += "[" + cell.getNumericCellValue() + "]";
-                        break;
- 
-                    case Cell.CELL_TYPE_FORMULA:
-                        result += "[" + cell.getNumericCellValue() + "]";
-                        break;
-                    default:
-                        result += "|";
-                        break;
-                }
-            }
-            result += "\n";
-        }
- 
-        return result;*/
 
         //String result = "";
         FileInputStream fis = null;
@@ -141,30 +97,6 @@ public class ExcelParser {
 
         while (rowIterator.hasNext()) {
             row = (XSSFRow) rowIterator.next();
-            /*Iterator < Cell > cellIterator = row.cellIterator();
-         while ( cellIterator.hasNext()) 
-         {
-            Cell cell = cellIterator.next();
-            int cellType = cell.getCellType();
-      //перебираем возможные типы ячеек
-                switch (cellType) {
-                    case Cell.CELL_TYPE_STRING:
-                        result += cell.getStringCellValue() + "=";
-                        break;
-                    case Cell.CELL_TYPE_NUMERIC:
-                        result += "[" + cell.getNumericCellValue() + "]";
-                        break;
- 
-                    case Cell.CELL_TYPE_FORMULA:
-                        result += "[" + cell.getNumericCellValue() + "]";
-                        break;
-                    default:
-                        result += "|";
-                        break;
-                }
-            }
-            result += "\n";*/
-
             buf = new ObjT();
             for (int i = 0; i < 8; i++) {
                 switch (i) {
@@ -224,9 +156,8 @@ public class ExcelParser {
 
             }
             objT.add(buf);
-            //System.out.println("!!!!!!!!!!!!!!!!!!!!!!" + buf.toString());
         }
-
+        
         //Определини экстернов значений
         ArrayList<Znach> znachs = new ArrayList<Znach>();
         Znach znach;
@@ -238,9 +169,9 @@ public class ExcelParser {
             float maxC = objT.get(pos).getCenO();
             int minO = objT.get(pos).getOts();
             int maxO = objT.get(pos).getOts();
-
-            while (objT.get(pos).getLot() == (i + 1) && pos <= objT.size() - 2) {
-
+            System.out.println("Lot #" + (i+1));
+            while (pos <= (objT.size() - 1) && objT.get(pos).getLot() == (i + 1)  ) {
+                System.out.println("Iteraciy!!!!!!!!!");
                 if (objT.get(pos).getCenO() > maxC && objT.get(pos).getCenO() != 0) {
                     maxC = objT.get(pos).getCenO();
                 }
@@ -254,14 +185,13 @@ public class ExcelParser {
                 if (objT.get(pos).getOts() < minO) {
                     minO = objT.get(pos).getOts();
                 }
-                if (pos < objT.size() - 1) {
+                if (pos <= objT.size() - 1) {
                     pos++;
                 }//if
-                //     System.out.println(pos);
+                //pos++;
             }
 
             znach = new Znach((int) (i + 1), maxC, minC, maxO, minO);
-            //System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + znach.toString());
             znachs.add(znach);
 
         }
@@ -278,37 +208,29 @@ public class ExcelParser {
             }
         }
 
-        /*ObjT z1 = new ObjT(); test getRaschet
-        z1 = objT.get(20);
-        System.out.println("Z " + z1.toString());
-        //ObjT zz =new ObjT();
-        z1 = getRaschet(z1, znachs.get(z1.getLot()).getCenaMax(), znachs.get(z1.getLot()).getCenaMin(), znachs.get(z1.getLot()).getOtsMax(), znachs.get(z1.getLot()).getOtsMin());
-         System.out.println("Z posle " + z1.toString());
-         System.out.println("ObjT " + objT.get(20));*/
         //попарное сравнение
         ArrayList<ObjT> parSrav = new ArrayList<ObjT>();
-        System.out.println(objT.size());
+        //System.out.println(objT.size());
         for (int i = 0; i < objT.size() - 1; i++) {
-            ObjT bufO = new ObjT(objT.get(i));
+            ObjT bufO;// = new ObjT(objT.get(i));
             //int k = i + 1;
             float maxC;
             float minC;
             int maxO;
             int minO;
             if (i < objT.size() - 2 && objT.get(i).getCenO() != 0) {
-                //while (objT.get(k).getCenO() != 0 && objT.get(i).getLot() == objT.get(k).getLot()) {
                 for (int k = i + 1; k < objT.size(); k++) {
 
                     if (objT.get(k).getCenO() != 0 && objT.get(i).getLot() == objT.get(k).getLot()) {
-
+                        bufO = new ObjT(objT.get(i));
                         ObjT bufOp = new ObjT(objT.get(k));
 
                         if (objT.get(i).getCenO() > objT.get(k).getCenO()) {
-                            maxC = objT.get(i).getCenO();
-                            minC = objT.get(k).getCenO();
+                            maxC = (float)objT.get(i).getCenO();
+                            minC = (float) objT.get(k).getCenO();
                         } else {
-                            maxC = objT.get(k).getCenO();
-                            minC = objT.get(i).getCenO();
+                            maxC = (float) objT.get(k).getCenO();
+                            minC = (float) objT.get(i).getCenO();
                         }
 
                         if (objT.get(i).getOts() > objT.get(k).getOts()) {
@@ -351,7 +273,7 @@ public class ExcelParser {
                 bals.add(bal);
             }
         }
-
+        
         //сортировка  в каждом лоте по убыванию общих балов
         pos = 0;
         for (int i = 1; i <= bals.get(bals.size() - 1).getLot(); i++) {
@@ -395,211 +317,15 @@ public class ExcelParser {
         for (int i = 0; i < bals.size(); i++) {
             objT.get(bals.get(i).getPos()).setRang((int) bals.get(i).getRang());
         }
-
-        for (int i = 0; i < bals.size(); i++) {//bals.size()
-            System.out.println(bals.get(i).toString());
-        }
-
-        /*
-        //проверка принципа
-        System.out.println("До сортировки:");
         
-        ArrayList<Double> mas = new ArrayList<Double>();
+        Write writeTab = new Write (objT, parSrav, znachs, workbook);
         
-        for (int i = 0; i < 10; i++) {
-            mas.add(new Double(((i + 1)*(0.123456789*i))+i));
-            System.out.print(mas.get(i) + " ");
-        }
-
-        for (int i = 1; i < mas.size(); i++) {
-            for (int j = 0; j < mas.size() - i; j++) {
-                if (mas.get(j) < mas.get(j + 1)) {
-
-                   Double bufM = new Double(mas.get(j));
-
-                    mas.set(j, mas.get(j + 1));
-                    mas.set((j + 1), bufM);
-                }
-            }
-        }
-        System.out.println("\nПосле сортировки:");
+        writeTab.writeObj();
+        writeTab.writePar();
+        writeTab.writeZnach();
         
-        for (int i = 0; i < mas.size(); i++) {
-            System.out.print(mas.get(i) + " ");
-        }
-        for (int i = 0; i < 10; i++) {
-            System.out.println(objT.get(i).toString());
-        }
-/*System.out.println("Znach!!!!!!!!!!!!!!!!!!!!!!!!!");
-        for (int i = 0; i < 9; i++) {
-            System.out.println(znachs.get(i).toString());
-        }
-System.out.println("Bal!!!!!!!!!!!!!!!!!!!!!!!!!");
-        for (int i = 40; i < 51; i++) {//bals.size()
-            System.out.println(bals.get(i).toString());
-        }*/
-        //Экспорт в Excel
-        XSSFSheet sheet = workbook.createSheet("Оценка общая");
-        /*Object[][] datatypes = {
-            {"Datatype", "Type", "Size(in bytes)"},
-            {"int", "Primitive", 2},
-            {"float", "Primitive", 4},
-            {"double", "Primitive", 8},
-            {"char", "Primitive", 1},
-            {"String", "Non-Primitive", "No fixed size"}
-        };
-
-        int rowNum = 0;
-        System.out.println("Creating excel");
-
-        for (Object[] datatype : datatypes) {
-            Row row = sheet.createRow(rowNum++);
-            int colNum = 0;
-            for (Object field : datatype) {
-                Cell cell = row.createCell(colNum++);
-                if (field instanceof String) {
-                    cell.setCellValue((String) field);
-                } else if (field instanceof Integer) {
-                    cell.setCellValue((Integer) field);
-                }
-            }
-        }*/
-//      System.out.println(objT.get(50).toString());
-        for (int i = 0;
-                i < objT.size();
-                i++) {
-            Row row = sheet.createRow(i);
-            ObjT bufO = new ObjT(objT.get(i));
-            for (int j = 0; j < 14; j++) { // меншье 13 тк кол-во полей ObjT 14
-                Cell cell = row.createCell(j);
-                switch (j) {
-                    case 0:
-                        cell.setCellValue((int) bufO.getLot());
-                        break;
-                    case 1:
-                        cell.setCellValue((String) bufO.getNameC());
-                        break;
-                    case 2:
-                        cell.setCellValue((int) bufO.getOts());
-                        break;
-                    case 3:
-                        cell.setCellValue((String) bufO.getNameO());
-                        break;
-                    case 4:
-                        cell.setCellValue((String) bufO.getEd());
-                        break;
-                    case 5:
-                        cell.setCellValue((float) bufO.getCen());
-                        break;
-                    case 6:
-                        cell.setCellValue((float) bufO.getCenS());
-                        break;
-                    case 7:
-                        cell.setCellValue((float) bufO.getCenO());
-                        break;
-                    case 8:
-                        cell.setCellValue((float) bufO.getBalC());
-                        break;
-                    case 9:
-                        cell.setCellValue((float) bufO.getBalCk());
-                        break;
-                    case 10:
-                        cell.setCellValue((float) bufO.getBalO());
-                        break;
-                    case 11:
-                        cell.setCellValue((float) bufO.getBalOk());
-                        break;
-                    case 12:
-                        cell.setCellValue((float) bufO.getBalOb());
-                        break;
-                    case 13:
-                        cell.setCellValue(bufO.getRang());
-                        break;
-                }//switch
-            }
-        }
-
-        XSSFSheet sheetP = workbook.createSheet("Оценка попарная");
-        for (int i = 0;
-                i < parSrav.size();
-                i++) {
-            Row row = sheetP.createRow(i);
-            ObjT bufO = new ObjT(parSrav.get(i));
-            for (int j = 0; j < 14; j++) { // меншье 13 тк кол-во полей ObjT 14
-                Cell cell = row.createCell(j);
-                switch (j) {
-                    case 0:
-                        cell.setCellValue((int) bufO.getLot());
-                        break;
-                    case 1:
-                        cell.setCellValue((String) bufO.getNameC());
-                        break;
-                    case 2:
-                        cell.setCellValue((int) bufO.getOts());
-                        break;
-                    case 3:
-                        cell.setCellValue((String) bufO.getNameO());
-                        break;
-                    case 4:
-                        cell.setCellValue((String) bufO.getEd());
-                        break;
-                    case 5:
-                        cell.setCellValue((float) bufO.getCen());
-                        break;
-                    case 6:
-                        cell.setCellValue((float) bufO.getCenS());
-                        break;
-                    case 7:
-                        cell.setCellValue((float) bufO.getCenO());
-                        break;
-                    case 8:
-                        cell.setCellValue((float) bufO.getBalC());
-                        break;
-                    case 9:
-                        cell.setCellValue((float) bufO.getBalCk());
-                        break;
-                    case 10:
-                        cell.setCellValue((float) bufO.getBalO());
-                        break;
-                    case 11:
-                        cell.setCellValue((float) bufO.getBalOk());
-                        break;
-                    case 12:
-                        cell.setCellValue((float) bufO.getBalOb());
-                        break;
-                    case 13:
-                        cell.setCellValue(bufO.getRang());
-                        break;
-                }//switch
-            }
-        }
-
-        XSSFSheet znachM = workbook.createSheet("MinCena");
-        for (int i = 0; i < znachs.size(); i++) {
-            Row row = znachM.createRow(i);
-            Znach bufO = new Znach(znachs.get(i));
-            for (int j = 0; j < 5; j++) { // меншье 13 тк кол-во полей ObjT 14
-                Cell cell = row.createCell(j);
-                switch (j) {
-                    case 0:
-                        cell.setCellValue((int) bufO.getNomL());
-                        break;
-                    case 1:
-                        cell.setCellValue((float) bufO.getCenaMax());
-                        break;
-                    case 2:
-                        cell.setCellValue((float) bufO.getCenaMin());
-                        break;
-                    case 3:
-                        cell.setCellValue((int) bufO.getOtsMax());
-                        break;
-                    case 4:
-                        cell.setCellValue((int) bufO.getOtsMin());
-                        break;
-                }//switch
-            }
-        }
-
+        //workbook = writeTab.getWorkbook();
+        
         try {
             FileOutputStream outputStream = new FileOutputStream(window.getSelectedFile());
             workbook.write(outputStream);
@@ -610,7 +336,7 @@ System.out.println("Bal!!!!!!!!!!!!!!!!!!!!!!!!!");
             e.printStackTrace();
         }
 
-        System.out.println("Done, ObjT size = " + objT.size() + ", Bals size = " + bals.size());
+        System.out.println("Done");
 
         try {
             fis.close();
